@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CEMS Aravali - Event Portal</title>
+  <meta name="description" content="Discover and register for technical, cultural and sports events at Aravali College of Engineering and Management.">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <header class="site">
+    <div class="nav">
+      <a href="#home" class="logo">CEMS <span>ARAVALI</span></a>
+      <ul>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#events">Events</a></li>
+        <li><a href="#register">Register</a></li>
+        <li><button class="nav-btn" id="myTicketsBtn" type="button">🎟️ My Tickets</button></li>
+      </ul>
+    </div>
+  </header>
+
+  <section class="hero" id="home">
+    <span class="eyebrow">ACEM · EVENT MANAGEMENT HUB</span>
+    <h1>Explore. Participate. <em>Innovate.</em></h1>
+    <p class="lead">Join technical symposiums, cultural festivals and sports meets organized by the Aravali College of Engineering and Management.</p>
+    <div class="hero-actions">
+      <a href="#events" class="btn">Explore Events</a>
+      <a href="#register" class="btn btn-outline">Register Now</a>
+    </div>
+
+    <div class="countdown-wrap" id="countdownWrap" hidden>
+      <div class="countdown-label" id="cdLabel"></div>
+      <div class="countdown">
+        <div class="cd-box"><b id="cdD">0</b><small>Days</small></div>
+        <div class="cd-box"><b id="cdH">0</b><small>Hours</small></div>
+        <div class="cd-box"><b id="cdM">0</b><small>Mins</small></div>
+        <div class="cd-box"><b id="cdS">0</b><small>Secs</small></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="stats">
+    <div class="stat"><b id="statEvents">–</b><span>Upcoming events</span></div>
+    <div class="stat"><b id="statRegs">–</b><span>Students registered</span></div>
+    <div class="stat"><b id="statSeats">–</b><span>Seats still open</span></div>
+  </div>
+
+  <main class="container">
+    <section class="block" id="events">
+      <h2 class="section-title">Upcoming College Events</h2>
+      <p class="section-sub">Pick an event, grab your seat, get your ticket instantly.</p>
+
+      <div class="toolbar">
+        <div class="chips" id="chips"></div>
+        <input class="search" id="search" type="search" placeholder="Search events or venues…" aria-label="Search events">
+      </div>
+
+      <div class="event-grid" id="eventGrid">
+        <div class="empty">Loading events…</div>
+      </div>
+    </section>
+
+    <section class="block" id="register">
+      <h2 class="section-title">Register for an Event</h2>
+      <p class="section-sub">Fill in your details to receive your digital ticket.</p>
+
+      <div class="reg-card">
+        <form id="regForm" novalidate>
+          <div class="form-error" id="regError" role="alert"></div>
+
+          <div class="form-group">
+            <label for="fEvent">Event</label>
+            <select id="fEvent" required></select>
+          </div>
+          <div class="row">
+            <div class="form-group">
+              <label for="fName">Full name</label>
+              <input id="fName" type="text" autocomplete="name" required>
+            </div>
+            <div class="form-group">
+              <label for="fRoll">Roll number</label>
+              <input id="fRoll" type="text" required>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group">
+              <label for="fEmail">Email</label>
+              <input id="fEmail" type="email" autocomplete="email" required>
+            </div>
+            <div class="form-group">
+              <label for="fPhone">Phone</label>
+              <input id="fPhone" type="tel" autocomplete="tel" required>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group">
+              <label for="fBranch">Branch</label>
+              <select id="fBranch"></select>
+            </div>
+            <div class="form-group">
+              <label for="fYear">Year</label>
+              <select id="fYear">
+                <option>1st</option><option>2nd</option><option>3rd</option><option>4th</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn" id="regBtn" type="submit" style="width:100%">Get my ticket</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site">
+    <p>© <span id="yr"></span> Aravali College of Engineering and Management · CEMS</p>
+    <p><a href="/admin.html">Organizer login</a></p>
+  </footer>
+
+  <!-- Ticket modal -->
+  <div class="modal-bg" id="ticketModal" role="dialog" aria-modal="true" aria-label="Your ticket">
+    <div class="modal">
+      <button class="modal-close" data-close aria-label="Close">&times;</button>
+      <h3>Your ticket</h3>
+      <div id="ticketBody"></div>
+      <div style="display:flex;gap:.6rem;margin-top:1rem;flex-wrap:wrap">
+        <button class="btn btn-ghost" id="printTicket" type="button">🖨️ Print</button>
+        <button class="btn" data-close type="button">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- My tickets modal -->
+  <div class="modal-bg" id="myModal" role="dialog" aria-modal="true" aria-label="My tickets">
+    <div class="modal">
+      <button class="modal-close" data-close aria-label="Close">&times;</button>
+      <h3>My tickets</h3>
+      <form id="lookupForm" style="display:flex;gap:.6rem;margin-bottom:1rem">
+        <input id="lookupEmail" type="email" placeholder="Enter your email" required
+               style="flex:1;padding:.65rem .85rem;border:1px solid #cbd5e1;border-radius:8px;font:inherit">
+        <button class="btn" type="submit">Find</button>
+      </form>
+      <div id="myList"></div>
+    </div>
+  </div>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
