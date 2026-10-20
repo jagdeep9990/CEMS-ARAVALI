@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CEMS Admin - Aravali</title>
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem;
+      background: linear-gradient(135deg, #14275f, #1e3a8a 50%, #3b5bdb); }
+    .login-card { background: #fff; border-radius: 16px; padding: 2.2rem; width: 100%; max-width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,.3); }
+    .login-card h1 { color: var(--primary); font-size: 1.5rem; margin-bottom: .3rem; }
+    .login-card p { color: var(--muted); margin-bottom: 1.4rem; font-size: .95rem; }
+
+    .admin-nav { display: flex; gap: .4rem; flex-wrap: wrap; margin: 1.6rem 0; }
+    .tab { border: none; background: #fff; padding: .6rem 1.2rem; border-radius: 10px; font: inherit; font-weight: 600;
+      cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
+    .tab.active { background: var(--primary); color: #fff; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .kpi { background: #fff; border-radius: var(--radius); padding: 1.2rem; box-shadow: var(--shadow); }
+    .kpi b { display: block; font-size: 2rem; color: var(--primary); line-height: 1.2; }
+    .kpi span { color: var(--muted); font-size: .9rem; }
+
+    .cards2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.2rem; }
+    .card { background: #fff; border-radius: var(--radius); padding: 1.3rem; box-shadow: var(--shadow); margin-bottom: 1.2rem; }
+    .card h3 { margin-bottom: 1rem; color: var(--primary); font-size: 1.1rem; }
+
+    .hbar { margin-bottom: .8rem; font-size: .88rem; }
+    .hbar-top { display: flex; justify-content: space-between; margin-bottom: .2rem; gap: .5rem; }
+    .hbar-top span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .spark { display: flex; align-items: flex-end; gap: .5rem; height: 130px; }
+    .spark div { flex: 1; text-align: center; font-size: .72rem; color: var(--muted); display: flex; flex-direction: column; justify-content: flex-end; height: 100%; }
+    .spark i { display: block; background: linear-gradient(180deg, var(--primary-light), var(--primary)); border-radius: 6px 6px 0 0; min-height: 3px; }
+    .spark em { font-style: normal; font-weight: 700; color: var(--text); }
+
+    .table-wrap { overflow-x: auto; background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); }
+    table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+    th, td { text-align: left; padding: .7rem .9rem; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    th { background: #f9fafb; color: var(--muted); font-size: .78rem; text-transform: uppercase; letter-spacing: .5px; }
+    td.wrap { white-space: normal; min-width: 180px; }
+    .bar-top { display: flex; gap: .8rem; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    .bar-top select { padding: .55rem .8rem; border: 1px solid #cbd5e1; border-radius: 8px; font: inherit; }
+    .actions { display: flex; gap: .4rem; }
+
+    .checkin-card { max-width: 480px; }
+    .checkin-result { margin-top: 1rem; padding: .9rem 1rem; border-radius: 10px; display: none; }
+    .checkin-result.ok { display: block; background: #d1fae5; color: #065f46; }
+    .checkin-result.bad { display: block; background: #fee2e2; color: #991b1b; }
+  </style>
+</head>
+<body>
+
+  <!-- Login -->
+  <div class="login-wrap" id="loginView">
+    <form class="login-card" id="loginForm">
+      <h1>CEMS <span style="color:var(--accent)">Admin</span></h1>
+      <p>Organizer access for Aravali College events.</p>
+      <div class="form-error" id="loginError" role="alert"></div>
+      <div class="form-group">
+        <label for="pw">Password</label>
+        <input id="pw" type="password" autocomplete="current-password" required autofocus>
+      </div>
+      <button class="btn" type="submit" style="width:100%">Sign in</button>
+      <p style="margin:1rem 0 0;text-align:center"><a href="/" style="color:var(--primary)">← Back to site</a></p>
+    </form>
+  </div>
+
+  <!-- App -->
+  <div id="appView" hidden>
+    <header class="site">
+      <div class="nav">
+        <a href="/admin.html" class="logo">CEMS <span>ADMIN</span></a>
+        <ul>
+          <li><a href="/" target="_blank">View site ↗</a></li>
+          <li><button class="nav-btn" id="logoutBtn" type="button">Sign out</button></li>
+        </ul>
+      </div>
+    </header>
+
+    <div class="container">
+      <div class="admin-nav">
+        <button class="tab active" data-tab="dash">📊 Dashboard</button>
+        <button class="tab" data-tab="events">📅 Events</button>
+        <button class="tab" data-tab="regs">👥 Registrations</button>
+        <button class="tab" data-tab="checkin">✅ Check-in</button>
+      </div>
+
+      <!-- Dashboard -->
+      <div class="panel active" id="p-dash">
+        <div class="kpis">
+          <div class="kpi"><b id="kEvents">–</b><span>Total events</span></div>
+          <div class="kpi"><b id="kUpcoming">–</b><span>Upcoming</span></div>
+          <div class="kpi"><b id="kRegs">–</b><span>Confirmed registrations</span></div>
+          <div class="kpi"><b id="kIn">–</b><span>Checked in</span></div>
+        </div>
+        <div class="cards2">
+          <div class="card"><h3>Registrations by event</h3><div id="chByEvent"></div></div>
+          <div class="card"><h3>Registrations by branch</h3><div id="chByBranch"></div></div>
+          <div class="card"><h3>Last 7 days</h3><div class="spark" id="chSpark"></div></div>
+        </div>
+      </div>
+
+      <!-- Events -->
+      <div class="panel" id="p-events">
+        <div class="bar-top">
+          <h2 style="color:var(--primary)">Manage events</h2>
+          <button class="btn" id="newEventBtn" type="button">+ New event</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Title</th><th>Category</th><th>Date</th><th>Venue</th><th>Seats</th><th></th></tr></thead>
+            <tbody id="evBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Registrations -->
+      <div class="panel" id="p-regs">
+        <div class="bar-top">
+          <select id="regFilter" aria-label="Filter by event"></select>
+          <a class="btn btn-ghost" id="csvLink" href="#">⬇ Export CSV</a>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Ticket</th><th>Event</th><th>Name</th><th>Roll</th><th>Branch</th><th>Email</th><th>Phone</th><th>Status</th><th></th></tr></thead>
+            <tbody id="regBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Check-in -->
+      <div class="panel" id="p-checkin">
+        <div class="card checkin-card">
+          <h3>Check in a participant</h3>
+          <form id="checkinForm">
+            <div class="form-group">
+              <label for="ciCode">Ticket code</label>
+              <input id="ciCode" type="text" placeholder="ACEM-XXXXXX" autocomplete="off" style="text-transform:uppercase" required>
+            </div>
+            <button class="btn" type="submit">Check in</button>
+          </form>
+          <div class="checkin-result" id="ciResult"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Event editor modal -->
+  <div class="modal-bg" id="evModal" role="dialog" aria-modal="true">
+    <div class="modal">
+      <button class="modal-close" id="evClose" aria-label="Close">&times;</button>
+      <h3 id="evModalTitle">New event</h3>
+      <form id="evForm" novalidate>
+        <div class="form-error" id="evError" role="alert"></div>
+        <div class="form-group"><label for="eTitle">Title</label><input id="eTitle" required></div>
+        <div class="row">
+          <div class="form-group"><label for="eCat">Category</label><select id="eCat"></select></div>
+          <div class="form-group"><label for="eCap">Capacity</label><input id="eCap" type="number" min="1" value="100" required></div>
+        </div>
+        <div class="row">
+          <div class="form-group"><label for="eDate">Date &amp; time</label><input id="eDate" type="datetime-local" required></div>
+          <div class="form-group"><label for="eVenue">Venue</label><input id="eVenue" required></div>
+        </div>
+        <div class="form-group"><label for="eOrg">Organizer</label><input id="eOrg"></div>
+        <div class="form-group"><label for="eDesc">Description</label><textarea id="eDesc"></textarea></div>
+        <div class="form-group"><label for="eImg">Image URL (optional)</label><input id="eImg" type="url" placeholder="https://…"></div>
+        <label style="display:flex;gap:.5rem;align-items:center;margin-bottom:1.2rem">
+          <input type="checkbox" id="eFeat"> Mark as featured
+        </label>
+        <button class="btn" type="submit" style="width:100%">Save event</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script src="/js/admin.js"></script>
+</body>
+</html>
